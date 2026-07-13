@@ -1,4 +1,4 @@
-import { ensureProjectClaudeMd, run, runUserMessage, compactCurrentSession, compactCurrentThreadSession, agentDirKey } from "../runner";
+import { ensureProjectClaudeMd, run, runUserMessage, killActive, compactCurrentSession, compactCurrentThreadSession, agentDirKey } from "../runner";
 import { wrapUntrusted } from "../prompt-safety";
 import { isAllowed } from "../allowlist";
 import { extractErrorDetail } from "../messaging";
@@ -975,6 +975,12 @@ async function handleMessageCreate(token: string, message: DiscordMessage, skipC
 
     // Skill routing: detect slash commands and resolve to SKILL.md prompts
     const command = cleanContent.startsWith("/") ? cleanContent.trim().split(/\s+/, 1)[0].toLowerCase() : null;
+
+    if (command === "/kill" || command === "/stop") {
+      const killed = killActive();
+      await sendMessage(config.token, channelId, killed ? "Killed active agent." : "No active agent running.");
+      return;
+    }
 
     let skillContext: string | null = null;
     if (command) {
