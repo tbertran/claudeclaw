@@ -978,6 +978,12 @@ async function handleMessageCreate(token: string, message: DiscordMessage, skipC
     const command = cleanContent.startsWith("/") ? cleanContent.trim().split(/\s+/, 1)[0].toLowerCase() : null;
 
     if (command === "/kill" || command === "/stop") {
+      // killActive() is global: it kills every in-flight main run across all
+      // Discord channels/threads, not just the caller's. Combined with the
+      // channel-scoped allowlist (#248), a user authorized in one channel can
+      // kill runs in channels they aren't authorized for. Matches Telegram's
+      // existing /kill contract (not a regression); thread-scoped kill is
+      // tracked separately (see #237).
       const killed = killActive();
       await sendMessage(config.token, channelId, killed ? "Killed active agent." : "No active agent running.");
       return;
