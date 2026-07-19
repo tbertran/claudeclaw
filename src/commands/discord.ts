@@ -498,7 +498,7 @@ Rules:
     const { execSync } = await import("node:child_process");
     const input = `${systemPrompt}\n\n---\nUser message: ${text}`;
     const result = execSync(
-      `claude --model claude-sonnet-4-20250514 --print --output-format text`,
+      `claude --model claude-sonnet-5 --print --output-format text`,
       {
         input,
         encoding: "utf-8",
